@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+    </head>
+    <body>
+        <input type="text" name="ipt" id="ipt" value="" />
+        <button id="start">start</button>
+        <button id="stop">stop</button>
+        <button id="ale">alert</button>
+        <script type="text/javascript">
+            var ipt = document.getElementById("ipt");
+            var stop = document.getElementById("stop");
+            var start = document.getElementById("start");
+            var ale = document.getElementById("ale");
+            var worker = new Worker("test.js");
+            worker.onmessage = function(){
+                ipt.value = event.data;
+            };
+            stop.addEventListener("click",function(){
+                //用于关闭worker线程
+                worker.terminate();
+            });
+            start.addEventListener("click",function(){
+                //开起worker线程
+                worker = new Worker("test.js");
+            });
+            ale.addEventListener("click",function(){
+                alert("i'm a dialog");
+            });
+        </script>
+    </body>
+</html>
