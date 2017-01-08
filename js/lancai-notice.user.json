@@ -1,7 +1,7 @@
 [
   {
     "type": "start",
-    "wait": "60",
+    "wait": "60"
   },
   {
     "type": "get",
