@@ -1,83 +1,47 @@
-[
-  {
-    "type": "start",
-    "wait": "60"
-  },
-  {
-    "type": "get",
-    "iframeselector": "",
-    "datas": [
-      {
-        "selector": "strong",
-        "column": "新列",
-        "from": "text",
-        "iframeselector": ""
-      },
-    {
-        "selector": "div.container.relative > ul.clear-fix.no-style-list > li.header-main-nav-item:nth-child(3) > a.header-main-nav-link",
-        "column": "新列",
-        "from": "text",
-        "iframeselector": ""
-      }
-    ]
-  },
-  {
-    "type": "liststart",
+{
+    "type": "list",
     "selector": "ul#noticeList > li",
-    "maxpage":"2,",
-    "pageselector":"",
-    "iframeselector":""
-  },
-  {
-    "type": "get",
+    "max_page":"2,",
+    "page_selector":"#a",
+    "iframe_selector":"",
     "datas": [
       {
         "selector": " div.about-list-content  >  div.about-list-heading ",
         "column": "新列",
         "from": "text",
-        "iframeselector": "",
-        "opentab":[
-                      {
-                          "selector": "div#noticeDetailWrapper > h4",
-                          "column": "新列",
-                          "from": "text",
-                          "iframeselector": ""
-                      },
-                      {
-                          "selector": "div#noticeDetailWrapper > p",
-                          "column": "新列",
-                          "from": "text",
-                          "iframeselector": ""
-                      },
-                      {
-                          "selector": "div.information-notice-detail-content",
-                          "column": "新列",
-                          "from": "text",
-                          "iframeselector": ""
-                      }
-                ]
+        "iframe_selector": "",
+        "open_tab":[
+          {
+            "selector": "div#noticeDetailWrapper > h4",
+            "column": "新列",
+            "from": "text",
+            "iframe_selector": ""
+          },
+          {
+            "selector": "div#noticeDetailWrapper > p",
+            "column": "新列",
+            "from": "text",
+            "iframe_selector": ""
+          },
+          {
+            "selector": "div.information-notice-detail-content",
+            "column": "新列",
+            "from": "text",
+            "iframe_selector": ""
+          }
+        ]
       },
       {
         "selector": " div.about-list-content  >  p:nth-child(2) ",
         "column": "新列",
         "from": "text",
-        "iframeselector": ""
+        "iframe_selector": ""
       },
       {
         "selector": " div.about-list-content  >  p:nth-child(3)  >  span.pull-right ",
         "column": "新列",
         "from": "text",
-        "iframeselector": ""
+        "iframe_selector": ""
       }
     ]
-  },
-  {
-    "type": "listend"
-  },
-  {
-    "type": "pageend"
-  },
-  {
-    "type": "end"
-  }
-]
+}
