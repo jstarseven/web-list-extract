@@ -123,7 +123,7 @@ function extractDeal(item, element) {
  * @param action
  */
 function analyzerJson(task_json) {
-    if (isNullParam(task_json.type)) {
+    if (isNullParam(task_json.type) || "list" != task_json.type) {
         console.log(new Date() + ":json type is null");
         return;
     }
