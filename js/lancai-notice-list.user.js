@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Web-Source-Extract
+// @name         Web-Source-Extract-list
 // @namespace    http://your.homepage/
 // @version      0.1
 // @description  针对网页列表做数据翻页提取
@@ -11,20 +11,39 @@
 //全局变量
 //数据提交url
 var submitMessUrl = "http://127.0.0.1:8080/rzx-analyzer-control/task/submitMess.action";
-
+var open_store = [];
 var task_json = {
     "type": "list",
     "selector": "ul#noticeList > li",
-    "max_page": 8,
+    "max_page": 1,
     "page_selector": "#noticeListContent > div.media-page-box.clearfix.media-page.pull-right > a.pageTurnNext",
     "iframe_selector": "",
     "datas": [
         {
-            "selector": " div.about-list-content  >  div.about-list-heading ",
+            "selector": " div.about-list-content > div > a ",
             "column": "title",
             "from": "text",
             "iframe_selector": "",
-            "open_tab": []
+            "open_tab": [
+                {
+                    "selector": " #noticeDetailWrapper > h4 ",
+                    "column": "detail-title",
+                    "from": "text",
+                    "iframe_selector": ""
+                },
+                {
+                    "selector": " #noticeDetailWrapper > p ",
+                    "column": "detail-desc",
+                    "from": "text",
+                    "iframe_selector": ""
+                },
+                {
+                    "selector": " #noticeDetailWrapper > div ",
+                    "column": "detail-content",
+                    "from": "text",
+                    "iframe_selector": ""
+                }
+            ]
         },
         {
             "selector": " div.about-list-content  >  p:nth-child(2) ",
@@ -43,15 +62,20 @@ var task_json = {
 
 createPseudoStyle('surfilter_inject_mouse_css', "plum");
 
-var timer = setInterval(function () {
+var listTimer = setInterval(function () {
     var cur_page = sessionStorage.getItem("cur_page");
     if (!isNullParam(cur_page) && cur_page > task_json.max_page) {
-        clearInterval(timer);
+        clearInterval(listTimer);
         return;
     }
     new analyzerJson(task_json).executor();
-}, 3000);
+}, 5000);
 
+var openTabTimer = setInterval(function () {
+    var open_item = open_store.pop();
+    if (isNullParam(open_item))return;
+    $(open_item).simulate('click');
+}, 2000);
 
 //创建伪元素样式Pseudo Element style
 function createPseudoStyle(styleName, back_color) {
@@ -154,7 +178,7 @@ function analyzerJson(task_json) {
         console.log(new Date() + "start extract " + cur_page + " data");
         for (var i = 0; i < list_all.length; i++) {
             var data_items = this.datas, list_item_ele = list_all[i], list_item = {};
-            var list_item_key = cur_page + "-" + this.selector + "-" + i;
+            var list_item_key = "page-" + cur_page + "-" + i;
             for (var j = 0; j < data_items.length; j++) {
                 var item_sel = data_items[j].selector, item_col = data_items[j].column;
                 var item_ifr_sel = data_items[j].iframe_selector, item_open_type = data_items[j].open_tab;
@@ -163,7 +187,7 @@ function analyzerJson(task_json) {
                     datas_item_ele = document.querySelector(item_ifr_sel).contentWindow.document.querySelectorAll(item_sel);
                 list_item[item_col] = extractDeal(data_items[j], datas_item_ele);
                 if (!isNullParam(item_open_type))
-                    newTabAction(datas_item_ele, list_item_key, item_open_type).executor();
+                    new newTabAction(datas_item_ele, list_item_key, item_open_type).executor();
             }
             addTaskDataMap(list_item_key, list_item);
         }
@@ -183,30 +207,35 @@ function analyzerJson(task_json) {
  * @param open_sel
  * @param open_get
  */
-function newTabAction(click_ele, list_item_key, open_type) {
+function newTabAction(click_ele, list_item_key, open_tab) {
     this.executor = function () {
         //开新标签提取数据
-        if (isNullParam(click_ele) || isNullParam(list_item_key) || isNullParam(open_type))
+        if (isNullParam(click_ele) || isNullParam(list_item_key) || isNullParam(open_tab))
             return;
+        //新标签数据记录
         //模拟点击打开新标签
-        click_ele.setAttribute('target', '_blank');
+        var click_dom = click_ele.get(0);
+        click_dom.setAttribute('target', '_blank');
+        var click_href = click_dom.getAttribute("href");
+        if (!isNullParam(click_href)) {
+            var data_key = click_href + "&data_key=" + list_item_key;
+            click_dom.setAttribute("href", click_href.indexOf("?") > 0 ? data_key : data_key.replace("&data_key", "?data_key"));
+        }
         //将新标签selector信息放入localstorage中
         var config = {
             "cur_key": list_item_key,
-            "cur_opentab": open_type
+            "cur_opentab": open_tab
         };
-        localStorage.setItem("cur_config", JSON.stringify(config));
-        click_ele.click();
+        localStorage.setItem(list_item_key, JSON.stringify(config));
+        open_store.push(click_dom);
     };
 }
-
 
 /**
  *获取当前任务配置信息
  */
 function getTaskDataMap() {
     var data_maps = localStorage.getItem("data_maps");
-    //debugger;
     var datas = new Map();
     if (isNullParam(data_maps)) {
         data_maps = datas;
@@ -249,6 +278,29 @@ function addTaskDataMap(key, values) {
  */
 function sleep(d) {
     for (var t = Date.now(); Date.now() - t <= d;);
+}
+
+/**
+ * 关闭当前窗口
+ * @constructor
+ */
+function closeWebPage() {
+    if (navigator.userAgent.indexOf("MSIE") > 0) {
+        if (navigator.userAgent.indexOf("MSIE 6.0") > 0) {
+            window.opener = null;
+            window.close();
+        } else {
+            window.open('', '_top');
+            window.top.close();
+        }
+    }
+    else if (navigator.userAgent.indexOf("Firefox") > 0) {
+        window.location.href = 'about:blank ';
+    } else {
+        window.opener = null;
+        window.open('', '_self', '');
+        window.close();
+    }
 }
 
 //判断对象属性值是否有空值
