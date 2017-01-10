@@ -184,7 +184,7 @@ function analyzerJson(task_json) {
                 var item_ifr_sel = data_items[j].iframe_selector, item_open_type = data_items[j].open_tab;
                 var datas_item_ele = $(list_item_ele).find(item_sel);
                 if (!isNullParam(item_ifr_sel))
-                    datas_item_ele = document.querySelector(item_ifr_sel).contentWindow.document.querySelectorAll(item_sel);
+                    datas_item_ele = document.querySelector(item_ifr_sel).contentWindow.document.querySelector(item_sel);
                 list_item[item_col] = extractDeal(data_items[j], datas_item_ele);
                 if (!isNullParam(item_open_type))
                     new newTabAction(datas_item_ele, list_item_key, item_open_type).executor();

@@ -8,31 +8,55 @@
 // @grant        none
 // ==/UserScript==
 
-webExcutor();
 
-function webExcutor() {
-    debugger;
-    var data_key = getUrlParamValue("data_key");
-    if (isNullParam(data_key))return;
-    var config = localStorage.getItem(data_key);
-    if (isNullParam(config))return;
-    config = JSON.parse(config);
-    var open_tab = config.cur_opentab;
-    if (isNullParam(open_tab))return;
-    var data_map = getTaskDataMap();
-    if (isNullParam(data_map))return;
-    var cur_list_item = data_map.get(data_key);
-    for (var i = 0; i < open_tab.length; i++) {
-        var item = open_tab[i], item_ele;
-        item_ele = document.querySelectorAll(item.selector);
-        if (!isNullParam(item.iframe_selector))
-            item_ele = document.querySelector(item.iframe_selector).contentWindow.document.querySelectorAll(item.selector);
-        cur_list_item[item.column] = extractDeal(item, item_ele);
+(function () {
+    'use strict';
+    var detailTimer = setTimeout(function () {
+        var data_key = getUrlParamValue("data_key");
+        var isSuc = new webExcutor(data_key).executor();
+        if ("success" == isSuc) {
+            clearTimeout(detailTimer);
+            closeWebPage();
+        }
+    }, 3000);
+})();
+
+
+/**
+ * 抽取详情页面数据字段
+ * @param data_key
+ */
+function webExcutor(data_key) {
+    this.executor = function () {
+        if (isNullParam(data_key))
+            return "fail";
+        var config = localStorage.getItem(data_key);
+        console.log("opentab=" + JSON.stringify(config));
+        if (isNullParam(config))
+            return "fail";
+        config = JSON.parse(config);
+        var open_tab = config.cur_opentab;
+        console.log("opentab=" + JSON.stringify(open_tab));
+        if (isNullParam(open_tab))
+            return "fail";
+        var data_map = getTaskDataMap();
+        if (isNullParam(data_map))
+            return "fail";
+        console.log(new Date() + "open new tab <" + data_key + ">");
+        var cur_list_item = data_map.get(data_key);
+        for (var i = 0; i < open_tab.length; i++) {
+            var item = open_tab[i], item_ele;
+            item_ele =  $(item.selector);
+            console.log("selector= " + item.selector + "---" + JSON.stringify(item_ele) + "---" + $(item.selector) + "---" + $(item.selector).text());
+            if (!isNullParam(item.iframe_selector))
+                item_ele = document.querySelector(item.iframe_selector).contentWindow.document.querySelector(item.selector);
+            cur_list_item[item.column] = extractDeal(item, item_ele);
+        }
+        addTaskDataMap(data_key, cur_list_item);
+        console.log(new Date() + "new tab data extract end");
+        console.log(new Date() + "close new tab <" + data_key + ">");
+        return "success"
     }
-    addTaskDataMap(data_key, cur_list_item);
-    //清除data_key
-    localStorage.setItem(data_key, "");
-    closeWebPage();
 }
 
 //脚本动作action
