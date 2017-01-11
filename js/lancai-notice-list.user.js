@@ -96,6 +96,7 @@ var task_json = {
                 win.document.body.appendChild(pre);
                 $(pre).html(jsonSyntaxHighLight(elements));
                 clearInterval(showJsonTimer);
+                clearTaskDataMap();
             }, 2000);
         }
         if (isNullParam(open_item))return;
