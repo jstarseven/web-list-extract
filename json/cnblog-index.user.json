@@ -1,0 +1,38 @@
+http://www.cnblogs.com/
+
+{
+    "type": "list",
+    "selector": "#post_list > div",
+    "max_page": 1,
+    "page_selector": "#paging_block > div > a:nth-child(14)",
+    "iframe_selector": "",
+    "datas": [
+        {
+            "selector": " div.post_item_body > h3 > a ",
+            "column": "title",
+            "from": "text",
+            "iframe_selector": "",
+            "open_tab": [
+
+            ]
+        },
+        {
+            "selector": " div.post_item_body > p ",
+            "column": "summary",
+            "from": "text",
+            "iframe_selector": ""
+        },
+        {
+            "selector": " div.post_item_body > div > a ",
+            "column": "time",
+            "from": "text",
+            "iframe_selector": ""
+        },
+        {
+            "selector": " div.post_item_body > div > span.article_view > a ",
+            "column": "read-num",
+            "from": "text",
+            "iframe_selector": ""
+        }
+    ]
+}

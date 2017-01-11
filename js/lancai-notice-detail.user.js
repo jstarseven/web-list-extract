@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Web-Source-Extract-detail
 // @namespace    http://your.homepage/
-// @version      0.1
+// @version      1.0
 // @description  针对网页列表做详情跳转提取
 // @author       jstarseven
-// @match        https://www.lancai.cn/about/*
+// @match        https://www.lancai.cn/about/notice_detail.html?*
 // @grant        none
 // ==/UserScript==
 
@@ -31,30 +31,24 @@ function webExcutor(data_key) {
         if (isNullParam(data_key))
             return "fail";
         var config = localStorage.getItem(data_key);
-        console.log("opentab=" + JSON.stringify(config));
         if (isNullParam(config))
             return "fail";
         config = JSON.parse(config);
         var open_tab = config.cur_opentab;
-        console.log("opentab=" + JSON.stringify(open_tab));
         if (isNullParam(open_tab))
             return "fail";
         var data_map = getTaskDataMap();
         if (isNullParam(data_map))
             return "fail";
-        console.log(new Date() + "open new tab <" + data_key + ">");
         var cur_list_item = data_map.get(data_key);
         for (var i = 0; i < open_tab.length; i++) {
             var item = open_tab[i], item_ele;
             item_ele =  $(item.selector);
-            console.log("selector= " + item.selector + "---" + JSON.stringify(item_ele) + "---" + $(item.selector) + "---" + $(item.selector).text());
             if (!isNullParam(item.iframe_selector))
                 item_ele = document.querySelector(item.iframe_selector).contentWindow.document.querySelector(item.selector);
             cur_list_item[item.column] = extractDeal(item, item_ele);
         }
         addTaskDataMap(data_key, cur_list_item);
-        console.log(new Date() + "new tab data extract end");
-        console.log(new Date() + "close new tab <" + data_key + ">");
         return "success"
     }
 }
@@ -175,7 +169,6 @@ function isNullObject(param) {
 //判断参数值是否是空值
 function isNullParam(param) {
     return !!(param == "" || null == param || param == undefined);
-
 }
 //判断参数值是否是数字
 function isNumber(param) {

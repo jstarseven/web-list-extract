@@ -1,60 +1,46 @@
 // ==UserScript==
-// @name         Web-Source-Extract-list
+// @name         cnblogs-index-list
 // @namespace    http://your.homepage/
 // @version      1.0
 // @description  针对网页列表做数据翻页提取
 // @author       jstarseven
-// @match        https://www.lancai.cn/about/notice.html
+// @match        http://www.cnblogs.com/
 // @grant        none
 // ==/UserScript==
 
 //全局变量
 //数据提交url
 var submitMessUrl = "http://127.0.0.1:8080/rzx-analyzer-control/task/submitMess.action";
-var formatJsonUrl = "http://tool.oschina.net/codeformat/json";
 var open_store = [];
 var task_json = {
     "type": "list",
-    "selector": "ul#noticeList > li",
+    "selector": "#post_list > div",
     "max_page": 1,
-    "page_selector": "#noticeListContent > div.media-page-box.clearfix.media-page.pull-right > a.pageTurnNext",
+    "page_selector": "#paging_block > div > a:nth-child(14)",
     "iframe_selector": "",
     "datas": [
         {
-            "selector": " div.about-list-content > div > a ",
+            "selector": " div.post_item_body > h3 > a ",
             "column": "title",
             "from": "text",
             "iframe_selector": "",
-            "open_tab": [
-                {
-                    "selector": " #noticeDetailWrapper > h4 ",
-                    "column": "detail-title",
-                    "from": "text",
-                    "iframe_selector": ""
-                },
-                {
-                    "selector": " #noticeDetailWrapper > p ",
-                    "column": "detail-desc",
-                    "from": "text",
-                    "iframe_selector": ""
-                },
-                {
-                    "selector": " #noticeDetailWrapper > div ",
-                    "column": "detail-content",
-                    "from": "text",
-                    "iframe_selector": ""
-                }
-            ]
+            "open_tab": []
         },
         {
-            "selector": " div.about-list-content  >  p:nth-child(2) ",
-            "column": "content",
+            "selector": " div.post_item_body > p ",
+            "column": "summary",
             "from": "text",
             "iframe_selector": ""
         },
         {
-            "selector": " div.about-list-content  >  p:nth-child(3)  >  span.pull-right ",
+            "selector": " div.post_item_body > div > a ",
             "column": "time",
+            "from": "text",
+            "iframe_selector": ""
+        },
+        {
+            "selector": " div.post_item_body > div > span.article_view > a ",
+            "column": "read-num",
             "from": "text",
             "iframe_selector": ""
         }
@@ -68,36 +54,12 @@ var task_json = {
         var cur_page = sessionStorage.getItem("cur_page");
         if (!isNullParam(cur_page) && cur_page > task_json.max_page) {
             clearInterval(listTimer);
-            open_store.push("listend");
             return;
         }
         new analyzerJson(task_json).executor();
     }, 5000);
     var openTabTimer = setInterval(function () {
-        var open_item = open_store.shift();
-        if ("listend" == open_item) {
-            clearInterval(openTabTimer);
-            var showJsonTimer = setInterval(function () {
-                var elements = getTaskDataMap().elements;
-                //判断是否开始展示json数据
-                var lastJson = elements[elements.length - 1];
-                if (getCount(JSON.stringify(task_json), "column") != countProp(lastJson.value))
-                    return;
-                var win = window.open('about:blank', 'web.format.json');
-                var style = win.document.createElement("style");
-                style.innerHTML = 'pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }' +
-                    '.string { color: green; } ' +
-                    '.number { color: darkorange; }' +
-                    '.boolean { color: blue; } ' +
-                    '.null { color: magenta; } ' +
-                    '.key { color: red; }';
-                win.document.head.appendChild(style);
-                var pre = win.document.createElement("pre");
-                win.document.body.appendChild(pre);
-                $(pre).html(jsonSyntaxHighLight(elements));
-                clearInterval(showJsonTimer);
-            }, 2000);
-        }
+        var open_item = open_store.pop();
         if (isNullParam(open_item))return;
         $(open_item).simulate('click');
     }, 2000);
@@ -235,7 +197,6 @@ function analyzerJson(task_json) {
  */
 function newTabAction(click_ele, list_item_key, open_tab) {
     this.executor = function () {
-        console.log(new Date() + "open new tab <" + list_item_key + ">");
         //开新标签提取数据
         if (isNullParam(click_ele) || isNullParam(list_item_key) || isNullParam(open_tab))
             return;
@@ -293,32 +254,6 @@ function addTaskDataMap(key, values) {
     localStorage.setItem("data_maps", JSON.stringify(data_maps));
 }
 
-/**
- * 格式化json
- * @param json
- * @returns {string|XML}
- */
-function jsonSyntaxHighLight(json) {
-    if (typeof json != 'string') {
-        json = JSON.stringify(json, undefined, 2);
-    }
-    json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
-    return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-        var cls = 'number';
-        if (/^"/.test(match)) {
-            if (/:$/.test(match)) {
-                cls = 'key';
-            } else {
-                cls = 'string';
-            }
-        } else if (/true|false/.test(match)) {
-            cls = 'boolean';
-        } else if (/null/.test(match)) {
-            cls = 'null';
-        }
-        return '<span class="' + cls + '">' + match + '</span>';
-    });
-}
 //-------------------------------------------------------------------------------------------------------------------------------------
 /**
  * Created by jstarseven on 2016/4/6.
@@ -397,21 +332,6 @@ function displayProp(obj) {
     }
     alert(names);
 }
-//统计对象属性值个数
-function countProp(obj) {
-    var count = 0;
-    for (var name in obj) {
-        count++
-    }
-    return count;
-}
-
-//统计字符串中指定字符个数
-function getCount(str1, str2) {
-    var r = new RegExp(str2, "gi");
-    return str1.match(r).length;
-}
-
 //获取url参数
 function getUrlParamValue(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");

@@ -1,134 +1,49 @@
-[
-  {
-    "type": "start",
-    "wait": "60",
-  },
-  {
-    "type": "pagestart",
-    "wait": 3,
-    "maxpage": "2",
-    "selector": "a.pageTurnNext",
-    "iframeselector": ""
-  },
-  {
-    "type": "get",
-    "iframeselector": "",
-    "datas": [
-      {
-        "selector": "strong",
-        "column": "新列",
-        "from": "text",
-        "regx": "",
-        "regvalue": "",
-        "defaultValue": "",
-        "iframeselector": "",
-        "islistitem": "false"
-      },
-	  {
-        "selector": "div.container.relative > ul.clear-fix.no-style-list > li.header-main-nav-item:nth-child(3) > a.header-main-nav-link",
-        "column": "新列",
-        "from": "text",
-        "regx": "",
-        "regvalue": "",
-        "defaultValue": "",
-        "iframeselector": "",
-        "islistitem": "false"
-      }
-    ]
-  },
-  {
-    "type": "liststart",
+https://www.lancai.cn/about/notice.html
+
+{
+    "type": "list",
     "selector": "ul#noticeList > li",
-    "iframeselector": ""
-  },
-  {
-    "type": "get",
+    "max_page": 2,
+    "page_selector": "#noticeListContent > div.media-page-box.clearfix.media-page.pull-right > a.pageTurnNext",
+    "iframe_selector": "",
     "datas": [
-      {
-        "selector": " div.about-list-content  >  div.about-list-heading ",
-        "column": "新列",
-        "from": "text",
-        "regx": "",
-        "regvalue": "",
-        "defaultValue": "",
-        "iframeselector": "",
-        "islistitem": "true"
-      },
-      {
-        "selector": " div.about-list-content  >  p:nth-child(2) ",
-        "column": "新列",
-        "from": "text",
-        "regx": "",
-        "regvalue": "",
-        "defaultValue": "",
-        "iframeselector": "",
-        "islistitem": "true"
-      },
-      {
-        "selector": " div.about-list-content  >  p:nth-child(3)  >  span.pull-right ",
-        "column": "新列",
-        "from": "text",
-        "regx": "",
-        "regvalue": "",
-        "defaultValue": "",
-        "iframeselector": "",
-        "islistitem": "true"
-      }
+        {
+            "selector": " div.about-list-content > div > a ",
+            "column": "title",
+            "from": "text",
+            "iframe_selector": "",
+            "open_tab": [
+                {
+                    "selector": " #noticeDetailWrapper > h4 ",
+                    "column": "detail-title",
+                    "from": "text",
+                    "iframe_selector": ""
+                },
+                {
+                    "selector": " #noticeDetailWrapper > p ",
+                    "column": "detail-desc",
+                    "from": "text",
+                    "iframe_selector": ""
+                },
+                {
+                    "selector": " #noticeDetailWrapper > div ",
+                    "column": "detail-content",
+                    "from": "text",
+                    "iframe_selector": ""
+                }
+            ]
+        },
+        {
+            "selector": " div.about-list-content  >  p:nth-child(2) ",
+            "column": "content",
+            "from": "text",
+            "iframe_selector": ""
+        },
+        {
+            "selector": " div.about-list-content  >  p:nth-child(3)  >  span.pull-right ",
+            "column": "time",
+            "from": "text",
+            "iframe_selector": ""
+        }
     ]
-  },
-  {
-    "type": "opentab",
-    "desc": "打开新标签",
-    "islistitem": "true",
-    "selector": " div.about-list-content  >  div.about-list-heading  >  a.fs-extra-normal "
-  },
-  {
-    "type": "get",
-    "desc": "提取数据",
-    "iframeselector": ""
-    "datas": [
-      {
-        "selector": "div#noticeDetailWrapper > h4",
-        "column": "新列",
-        "from": "text",
-        "regx": "",
-        "regvalue": "",
-        "defaultValue": "",
-        "iframeselector": "",
-        "islistitem": "false"
-      },
-	  {
-        "selector": "div#noticeDetailWrapper > p",
-        "column": "新列",
-        "from": "text",
-        "regx": "",
-        "regvalue": "",
-        "defaultValue": "",
-        "iframeselector": "",
-        "islistitem": "false"
-      },
-	  {
-        "selector": "div.information-notice-detail-content",
-        "column": "新列",
-        "from": "text",
-        "regx": "",
-        "regvalue": "",
-        "defaultValue": "",
-        "iframeselector": "",
-        "islistitem": "false"
-      }
-    ]
-  },
-  {
-    "type": "closetab"
-  },
-  {
-    "type": "listend"
-  },
-  {
-    "type": "pageend"
-  },
-  {
-    "type": "end"
-  }
-]
+}
