@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Web-Source-Extract-list
+// @name         web-extract-list
 // @namespace    http://your.homepage/
 // @version      1.0
 // @description  针对网页列表做数据翻页提取

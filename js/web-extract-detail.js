@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Web-Source-Extract-detail
+// @name         web-extract-detail
 // @namespace    http://your.homepage/
 // @version      1.0
 // @description  针对网页列表做详情跳转提取
