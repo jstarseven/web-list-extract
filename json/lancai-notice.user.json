@@ -1,5 +1,3 @@
-https://www.lancai.cn/about/notice.html
-
 {
     "type": "list",
     "selector": "ul#noticeList > li",
