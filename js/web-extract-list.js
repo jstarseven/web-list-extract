@@ -9,9 +9,6 @@
 // ==/UserScript==
 
 //全局变量
-//数据提交url
-var submitMessUrl = "http://127.0.0.1:8080/rzx-analyzer-control/task/submitMess.action";
-var formatJsonUrl = "http://tool.oschina.net/codeformat/json";
 var open_store = [];
 var task_json = {
     "type": "list",
@@ -104,7 +101,12 @@ var task_json = {
     }, 2000);
 })();
 
-//创建伪元素样式Pseudo Element style
+/**
+ * 创建伪元素样式Pseudo Element style
+ * @param styleName
+ * @param back_color
+ * @returns {Element}
+ */
 function createPseudoStyle(styleName, back_color) {
     var style = document.createElement("style");
     style.innerHTML =
@@ -124,32 +126,6 @@ function createPseudoStyle(styleName, back_color) {
     document.head.appendChild(style);
     return style;
 }
-
-/**
- * 提交任务数据
- * @param mess
- */
-function submitMess(mess) {
-    $.ajax({
-        type: "POST",
-        url: submitMessUrl,
-        data: mess,
-        dataType: "jsonp",
-        jsonp: "callbackparam",
-        jsonpCallback: "success_jsonpCallback",
-        async: true,
-        cache: false,
-        success: function (data) {
-            console.log("message submit success");
-        },
-        error: function () {
-            console.log("message submit fail");
-        }
-    });
-}
-
-
-//脚本动作action
 
 /**
  * 抽取元素数据信息进行处理
@@ -231,17 +207,15 @@ function analyzerJson(task_json) {
 
 /**
  * 新建标签
- * @param open_sel
- * @param open_get
+ * @param click_ele
+ * @param list_item_key
+ * @param open_tab
  */
 function newTabAction(click_ele, list_item_key, open_tab) {
     this.executor = function () {
         console.log(new Date() + "open new tab <" + list_item_key + ">");
-        //开新标签提取数据
         if (isNullParam(click_ele) || isNullParam(list_item_key) || isNullParam(open_tab))
             return;
-        //新标签数据记录
-        //模拟点击打开新标签
         var click_dom = click_ele.get(0);
         click_dom.setAttribute('target', '_blank');
         var click_href = click_dom.getAttribute("href");
@@ -249,7 +223,6 @@ function newTabAction(click_ele, list_item_key, open_tab) {
             var data_key = click_href + "&data_key=" + list_item_key;
             click_dom.setAttribute("href", click_href.indexOf("?") > 0 ? data_key : data_key.replace("&data_key", "?data_key"));
         }
-        //将新标签selector信息放入localstorage中
         var config = {
             "cur_key": list_item_key,
             "cur_opentab": open_tab
@@ -300,9 +273,8 @@ function addTaskDataMap(key, values) {
  * @returns {string|XML}
  */
 function jsonSyntaxHighLight(json) {
-    if (typeof json != 'string') {
+    if (typeof json != 'string')
         json = JSON.stringify(json, undefined, 2);
-    }
     json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
     return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
         var cls = 'number';
@@ -321,22 +293,9 @@ function jsonSyntaxHighLight(json) {
     });
 }
 //-------------------------------------------------------------------------------------------------------------------------------------
-/**
- * Created by jstarseven on 2016/4/6.
- * 前端js基本函数库
- */
-
-/**
- * 暂停函数
- * @param d
- */
-function sleep(d) {
-    for (var t = Date.now(); Date.now() - t <= d;);
-}
 
 /**
  * 关闭当前窗口
- * @constructor
  */
 function closeWebPage() {
     if (navigator.userAgent.indexOf("MSIE") > 0) {
@@ -347,8 +306,7 @@ function closeWebPage() {
             window.open('', '_top');
             window.top.close();
         }
-    }
-    else if (navigator.userAgent.indexOf("Firefox") > 0) {
+    } else if (navigator.userAgent.indexOf("Firefox") > 0) {
         window.location.href = 'about:blank ';
     } else {
         window.opener = null;
@@ -357,141 +315,38 @@ function closeWebPage() {
     }
 }
 
-//判断对象属性值是否有空值
-function hasPropertiesNull(param) {
-    var values;
-    for (var name in param) {
-        values = param[name];
-        if (values == "" || null == values || values == undefined) {
-            return true;
-        }
-    }
-    return false;
-}
-//判断对象属性值是否有空值
-function isNullObject(param) {
-    var values;
-    for (var name in param) {
-        values = param[name];
-        if (values != "" && null != values && values != undefined) {
-            return false;
-        }
-    }
-    return true;
-}
-//判断参数值是否是空值
+/**
+ * 判断参数值是否是空值
+ * @param param
+ * @returns {boolean}
+ */
 function isNullParam(param) {
     return !!(param == "" || null == param || param == undefined);
+}
 
-}
-//判断参数值是否是数字
-function isNumber(param) {
-    if (isNullParam(param))
-        return false;
-    return /^[0-9]+.?[0-9]*$/.test(param);
-}
-//获取对象属性值
-function displayProp(obj) {
-    var names = "";
-    for (var name in obj) {
-        names += name + ": " + obj[name] + ", ";
-    }
-    alert(names);
-}
-//统计对象属性值个数
+/**
+ * 统计对象属性值个数
+ * @param obj
+ * @returns {number}
+ */
 function countProp(obj) {
     var count = 0;
-    for (var name in obj) {
-        count++
-    }
+    for (var name in obj)count++;
     return count;
 }
 
-//统计字符串中指定字符个数
+/**
+ * 统计字符串中指定字符个数
+ * @param str1
+ * @param str2
+ * @returns {Number}
+ */
 function getCount(str1, str2) {
     var r = new RegExp(str2, "gi");
     return str1.match(r).length;
 }
 
-//获取url参数
-function getUrlParamValue(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-    var r = window.location.search.substr(1).match(reg);
-    if (r != null) return decodeURIComponent(r[2]);
-    return null;
-}
-/**
- * paramObj 将要转为URL参数字符串的对象
- * key URL参数字符串的前缀
- * encode true/false 是否进行URL编码,默认为true
- * js实现
- * return URL参数字符串
- */
-var urlEncode = function (paramObj, key, encode) {
-    if (paramObj == null) return "";
-    var paramStr = "";
-    var t = typeof (paramObj);
-    if (t == "string" || t == "number" || t == "boolean") {
-        paramStr += "&" + key + "=" + ((encode == null || encode) ? encodeURIComponent(paramObj) : paramObj);
-    } else {
-        for (var i in paramObj) {
-            var k = key == null ? i : key + (paramObj instanceof Array ? "[" + i + "]" : "." + i);
-            paramStr += urlEncode(paramObj[i], k, encode);
-        }
-    }
-    return paramStr;
-};
-// 将js对象转转成url jquery实现
-var parseParam = function (paramObj, key) {
-    var paramStr = "";
-    if (paramObj instanceof String || paramObj instanceof Number || paramObj instanceof Boolean) {
-        paramStr += "&" + key + "=" + encodeURIComponent(paramObj);
-    } else {
-        $.each(paramObj, function (i) {
-            var k = key == null ? i : key + (paramObj instanceof Array ? "[" + i + "]" : "." + i);
-            paramStr += "&" + parseParam(this, k);
-        });
-    }
-    return paramStr.substr(1);
-};
-// 获取url参数封装成对象
-function GetUrlParam() {
-
-    var url = location.search; //获取url中"?"符后的字串
-    var theRequest = new Object();
-    var strs;
-    if (url.indexOf("?") != -1) {
-        var str = url.substr(1);
-        strs = str.split("&");
-        for (var i = 0; i < strs.length; i++) {
-            theRequest[strs[i].split("=")[0]] = decodeURIComponent((strs[i].split("=")[1]));
-        }
-    }
-    return theRequest;
-}
-//删除数组中指定位置的元素 调用方式a=a.del(n)
-Array.prototype.del = function (n) {
-    if (n < 0)
-        return this;
-    else
-        return this.slice(0, n).concat(this.slice(n + 1, this.length));
-};
-//在数组指定位置插入 调用方式a.insert(n)
-Array.prototype.insert = function (index, item) {
-    if (index < 0)
-        return this;
-    else
-        return this.splice(index, 0, item);
-};
-//判断数组中是否包含指定字符串
-Array.prototype.containVal = function (needle) {
-    for (var i in this) {
-        if (this[i] == needle) return i;
-    }
-    return false;
-};
-
-/*   
+/*
  * MAP对象，实现MAP功能   
  *   
  * 接口：   

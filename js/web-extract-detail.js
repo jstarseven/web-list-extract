@@ -8,7 +8,6 @@
 // @grant        none
 // ==/UserScript==
 
-
 (function () {
     'use strict';
     var detailTimer = setTimeout(function () {
@@ -21,29 +20,24 @@
     }, 3000);
 })();
 
-
 /**
  * 抽取详情页面数据字段
  * @param data_key
  */
 function webExcutor(data_key) {
     this.executor = function () {
-        if (isNullParam(data_key))
-            return "fail";
+        if (isNullParam(data_key))return "fail";
         var config = localStorage.getItem(data_key);
-        if (isNullParam(config))
-            return "fail";
+        if (isNullParam(config))return "fail";
         config = JSON.parse(config);
         var open_tab = config.cur_opentab;
-        if (isNullParam(open_tab))
-            return "fail";
+        if (isNullParam(open_tab))return "fail";
         var data_map = getTaskDataMap();
-        if (isNullParam(data_map))
-            return "fail";
+        if (isNullParam(data_map))return "fail";
         var cur_list_item = data_map.get(data_key);
         for (var i = 0; i < open_tab.length; i++) {
             var item = open_tab[i], item_ele;
-            item_ele =  $(item.selector);
+            item_ele = $(item.selector);
             if (!isNullParam(item.iframe_selector))
                 item_ele = document.querySelector(item.iframe_selector).contentWindow.document.querySelector(item.selector);
             cur_list_item[item.column] = extractDeal(item, item_ele);
@@ -52,8 +46,6 @@ function webExcutor(data_key) {
         return "success"
     }
 }
-
-//脚本动作action
 
 /**
  * 抽取元素数据信息进行处理
@@ -109,21 +101,7 @@ function addTaskDataMap(key, values) {
 
 //-------------------------------------------------------------------------------------------------------------------------------------
 /**
- * Created by jstarseven on 2016/4/6.
- * 前端js基本函数库
- */
-
-/**
- * 暂停函数
- * @param d
- */
-function sleep(d) {
-    for (var t = Date.now(); Date.now() - t <= d;);
-}
-
-/**
  * 关闭当前窗口
- * @constructor
  */
 function closeWebPage() {
     if (navigator.userAgent.indexOf("MSIE") > 0) {
@@ -144,46 +122,11 @@ function closeWebPage() {
     }
 }
 
-//判断对象属性值是否有空值
-function hasPropertiesNull(param) {
-    var values;
-    for (var name in param) {
-        values = param[name];
-        if (values == "" || null == values || values == undefined) {
-            return true;
-        }
-    }
-    return false;
-}
-//判断对象属性值是否有空值
-function isNullObject(param) {
-    var values;
-    for (var name in param) {
-        values = param[name];
-        if (values != "" && null != values && values != undefined) {
-            return false;
-        }
-    }
-    return true;
-}
 //判断参数值是否是空值
 function isNullParam(param) {
     return !!(param == "" || null == param || param == undefined);
 }
-//判断参数值是否是数字
-function isNumber(param) {
-    if (isNullParam(param))
-        return false;
-    return /^[0-9]+.?[0-9]*$/.test(param);
-}
-//获取对象属性值
-function displayProp(obj) {
-    var names = "";
-    for (var name in obj) {
-        names += name + ": " + obj[name] + ", ";
-    }
-    alert(names);
-}
+
 //获取url参数
 function getUrlParamValue(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -191,76 +134,6 @@ function getUrlParamValue(name) {
     if (r != null) return decodeURIComponent(r[2]);
     return null;
 }
-/**
- * paramObj 将要转为URL参数字符串的对象
- * key URL参数字符串的前缀
- * encode true/false 是否进行URL编码,默认为true
- * js实现
- * return URL参数字符串
- */
-var urlEncode = function (paramObj, key, encode) {
-    if (paramObj == null) return "";
-    var paramStr = "";
-    var t = typeof (paramObj);
-    if (t == "string" || t == "number" || t == "boolean") {
-        paramStr += "&" + key + "=" + ((encode == null || encode) ? encodeURIComponent(paramObj) : paramObj);
-    } else {
-        for (var i in paramObj) {
-            var k = key == null ? i : key + (paramObj instanceof Array ? "[" + i + "]" : "." + i);
-            paramStr += urlEncode(paramObj[i], k, encode);
-        }
-    }
-    return paramStr;
-};
-// 将js对象转转成url jquery实现
-var parseParam = function (paramObj, key) {
-    var paramStr = "";
-    if (paramObj instanceof String || paramObj instanceof Number || paramObj instanceof Boolean) {
-        paramStr += "&" + key + "=" + encodeURIComponent(paramObj);
-    } else {
-        $.each(paramObj, function (i) {
-            var k = key == null ? i : key + (paramObj instanceof Array ? "[" + i + "]" : "." + i);
-            paramStr += "&" + parseParam(this, k);
-        });
-    }
-    return paramStr.substr(1);
-};
-// 获取url参数封装成对象
-function GetUrlParam() {
-
-    var url = location.search; //获取url中"?"符后的字串
-    var theRequest = new Object();
-    var strs;
-    if (url.indexOf("?") != -1) {
-        var str = url.substr(1);
-        strs = str.split("&");
-        for (var i = 0; i < strs.length; i++) {
-            theRequest[strs[i].split("=")[0]] = decodeURIComponent((strs[i].split("=")[1]));
-        }
-    }
-    return theRequest;
-}
-//删除数组中指定位置的元素 调用方式a=a.del(n)
-Array.prototype.del = function (n) {
-    if (n < 0)
-        return this;
-    else
-        return this.slice(0, n).concat(this.slice(n + 1, this.length));
-};
-//在数组指定位置插入 调用方式a.insert(n)
-Array.prototype.insert = function (index, item) {
-    if (index < 0)
-        return this;
-    else
-        return this.splice(index, 0, item);
-};
-//判断数组中是否包含指定字符串
-Array.prototype.containVal = function (needle) {
-    for (var i in this) {
-        if (this[i] == needle) return i;
-    }
-    return false;
-};
 
 /*   
  * MAP对象，实现MAP功能   
@@ -394,6 +267,4 @@ function Map() {
         }
         return arr;
     };
-
 }
-
