@@ -9,9 +9,11 @@
 // ==/UserScript==
 
 //全局变量
+var submitUrl = "http://127.0.0.1:8282/topic/collectTopic";
 var open_store = [];
 var task_json = {
     "type": "list",
+    "home_url": "https://www.lancai.cn/about/notice.html",
     "selector": "ul#noticeList > li",
     "max_page": 1,
     "page_selector": "#noticeListContent > div.media-page-box.clearfix.media-page.pull-right > a.pageTurnNext",
@@ -93,6 +95,7 @@ var task_json = {
                 win.document.body.appendChild(pre);
                 $(pre).html(jsonSyntaxHighLight(elements));
                 clearInterval(showJsonTimer);
+                submitMess(task_json.home_url, elements);
                 clearTaskDataMap();
             }, 2000);
         }
@@ -101,6 +104,35 @@ var task_json = {
     }, 2000);
 })();
 
+
+/**
+ * 消息数据提交
+ * @param home_url
+ * @param topics
+ */
+function submitMess(home_url, topics) {
+    if (isNullParam(home_url) || isNullParam(topics))return;
+    for(var i=0;i<topics.length;i++){
+        var param = {
+            "home_url": home_url,
+            "topics": JSON.stringify(topics[i])
+        };
+        $.ajax({
+            type: "POST",
+            url: submitUrl,
+            data: param,
+            dataType: "jsonp",
+            jsonp: "callbackparam",
+            async: true,
+            success: function (data) {
+                console.log("message date submit success !");
+            },
+            error: function () {
+                console.log("message date submit fail !");
+            }
+        });
+    }
+}
 /**
  * 创建伪元素样式Pseudo Element style
  * @param styleName
